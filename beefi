@@ -25,12 +25,14 @@ display_usage() {
     echo -e "  --current-cmdline    Use the current kernel command from /proc"
     echo -e "  -h --help            Show this screen."
     echo -e "  --version            Show version."
+    echo -e "\n"
     exit 1
 }
 
 display_version() {
     echo -e "beefi - a bootable EFISTUB kernel image generator"
     echo -e "Version $BEEFI_VERSION"
+    echo -e "\n"
     exit 0
 }
 
@@ -145,7 +147,6 @@ if [[ -z $KERNEL ]] || [[ -z $INITRD ]] || [[ -z $CMDLINE ]] || [[ -z $OUTPUT ]]
     [[ -n $INITRD ]] || echo "Error! Missing initrd image parameter!" >&2
     [[ -n $CMDLINE ]] || echo "Error! Missing cmdline paramater!" >&2
     [[ -n $OUTPUT ]] || echo "Error! Missing output parameter!" >&2
-    echo "whaaat?"
     display_usage
 fi
 
