@@ -1,0 +1,55 @@
+.\"Manpage for beefi.
+.\" Contact jan-frederick.eick@uni-weimar.de to correct errors or typos.
+.TH man 1 "13 May 2016" "0.1" "beefi man page"
+.SH NAME
+beefi \- create a bootable EFISTUB kernel image
+.SH SYNOPSIS
+beefi [ -u ] [ -c CMDLINE ] [ -k KERNEL ] [ -i INITRD ] [ -h ] [ --version ]
+.SH DESCRIPTION
+beefi is a script used to create a bootable EFISTUB kernel image with integrated kernel commandline and initramfs image. It uses objcopy to combine those components to one image which can be directly booted on UEFI systems.
+.SH OPTIONS
+The following is a list of options accepted by beefi
+.TP
+\fB-c | --cmdline\fR
+Sets the kernel command line
+.TP
+\fB-k | --kernel \fIKERNEL\fB\fR
+The location of the kernel image (e.g. \fI/boot/vmlinuz-linux\fR)
+.TP
+\fB-i | --initrd \fIINITRD\fB\fR
+The location of the initrd image (e.g. \fI/boot/initramfs-linux.img\fR)
+.TP
+\fB-o | --output \fOUTPUT\fB\fR
+The location of the output file (e.g. \fI/boot/efi/EFI/boot/bootx64.efi\fR)
+.TP
+\fB-u | --use-config\fR
+Use the configuration file \fI/etc/beefi.conf\fR
+.TP
+\fB-h | --help\fR
+Just print help string and exit
+.TP
+\fB--version\fR
+Just print version string and exit
+.SH EXAMPLES
+.TP 3
+.SS "Create a bootable image using the current kernel commandline."
+.PP
+Run:
+\fBbeefi --current-cmdline -k \fI/boot/vmlinuz-linux\fB -i \fI/boot/initramfs-linux.img\fB -o \fIoutput.efi\fR
+.TP 3
+.SS "Create a bootable image using a custom kernel commandline."
+.PP
+Run:
+\fBbeefi -c "root=UUID=aabbccdd-eeff-0011-223344556677 rw quiet" -k \fI/boot/vmlinuz-linux\fB -i \fI/boot/initramfs-linux.img\fB -o \fIoutput.efi\fR
+.TP 3
+.SS "Create a bootable image using the config file \fI/etc/beefi.conf\fR"
+.PP
+Run:
+\fBbeefi -u\fR
+.SH SEE ALSO
+efibootmgr(8), elilo(1)
+.SH BUGS
+Please direct any bugs, features, patches, etc. to Jan Frederick Eick: https://github.com/jfeick/beefi
+.AUTHOR
+Jan Frederick Eick (\fIjan-frederick.eick@uni-weimar.de\fR)
+

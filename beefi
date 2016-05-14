@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+
+EFISTUB=/usr/lib/systemd/boot/efi/linuxx64.efi.stub
+TMPOUT=combined-boot.efi
+CMDLINE=""
+KERNEL=""
+INITRD=""
+OUTPUT=""
+
+BEEFI_VERSION="0.1.0"
+CONFIG_FILE="/etc/beefi.conf"
+
+display_usage() {
+    echo -e "beefi - a bootable EFISTUB kernel image generator"
+    echo -e "\nUsage:"
+    echo -e "  $0 [-c CMDLINE] [-k KERNEL] [-i INITRD] [-o OUTPUT] [--current-cmdline]"
+    echo -e "  $0 -h | --help"
+    echo -e "\nArguments:"
+    echo -e "  -u --use-config      Use /etc/beefi.conf for configuration"
+    echo -e "  -c --cmdline         Kernel command line supplied for boot"
+    echo -e "  -k --kernel          Kernel image file"
+    echo -e "  -i --initrd          Kernel initrd file"
+    echo -e "  -o --output          Output efi file"
+    echo -e "\nOptions:"
+    echo -e "  --current-cmdline    Use the current kernel command from /proc"
+    echo -e "  -h --help            Show this screen."
+    echo -e "  --version            Show version."
+    exit 1
+}
+
+display_version() {
+    echo -e "beefi - a bootable EFISTUB kernel image generator"
+    echo -e "Version $BEEFI_VERSION"
+    exit 0
+}
+
+parse_config_file() {
+    typeset -A config # init array
+    config=( # set default values in config array
+        [KERNEL]=""
+        [INITRD]=""
+        [CURRENT]=""
+        [CMDLINE]=""
+        [OUTPUT]=""
+    )
+
+    while read line
+    do
+        if echo $line | grep -F = &>/dev/null
+        then
+            varname=$(echo "$line" | cut -d '=' -f 1)
+            config[$varname]=$(echo "$line" | cut -d '=' -f 2-)
+        fi
+    done < "$CONFIG_FILE"
+
+    if [ -n "${config[KERNEL]}" ]; then
+        KERNEL="${config[KERNEL]}"
+    fi
+    if [ -n "[$config[INITRD]}" ]; then
+        INITRD="${config[INITRD]}"
+    fi
+    if [ -n "${config[CURRENT]}" ] && [ "${config[CURRENT]}" == "y" ] || [ "${config[CURRENT]}" == "Y"]; then
+        CMDLINE="$(cat /proc/cmdline)"
+    fi
+    if [ -n "${config[CMDLINE]}" ]; then
+        CMDLINE="${config[CMDLINE]}"
+    fi
+    if [ -n "${config[OUTPUT]}" ]; then
+        OUTPUT="${config[OUTPUT]}"
+    fi
+}
+
+while [ -n "$1" ]; do
+    OPT="$1"
+    if [ x"$OPT" = x"--" ]; then
+        shift
+        for OPT ; do
+            REMAINS="$REMAINS \"$OPT\""
+        done
+        break
+    fi
+    while [ x"$OPT" != x"-" ] ; do
+        case "$OPT" in
+            -c=* | --cmdline=* )
+                CMDLINE="${OPT#*=}"
+                shift
+                ;;
+            -c* | --cmdline )
+                CMDLINE="$2"
+                shift
+                ;;
+            -k=* | --kernel=* )
+                KERNEL="${OPT#*=}"
+                shift
+                ;;
+            -k* | --kernel )
+                KERNEL="$2"
+                shift
+                ;;
+            -i=* | --initrd=* )
+                INITRD="${OPT#*=}"
+                shift
+                ;;
+            -i* | --initrd )
+                INITRD="$2"
+                shift
+                ;;
+            -o=* | --output=* )
+                OUTPUT="${OPT#*=}"
+                shift
+                ;;
+            -o | --output )
+                OUTPUT="$2"
+                shift
+                ;;
+            -u | --use-config )
+                parse_config_file
+                ;;
+            --current-cmdline )
+                CMDLINE=$(cat /proc/cmdline)
+                ;;
+            -h | --help )
+                display_usage
+                ;;
+            --version)
+                display_version
+                ;;
+            * )
+                REMAINS="$REMAINS \"$OPT\""
+                break
+                ;;
+        esac
+        NEXTOPT="${OPT#-[cfr]}"
+        if [ x"$OPT" != x"$NEXTOPT" ] ; then
+            OPT="-$NEXTOPT"  
+        else
+            break 
+        fi
+    done
+    shift
+done
+
+if [[ -z $KERNEL ]] || [[ -z $INITRD ]] || [[ -z $CMDLINE ]] || [[ -z $OUTPUT ]]; then
+    [[ -n $KERNEL ]] || echo "Error! Missing kernel image parameter!" >&2
+    [[ -n $INITRD ]] || echo "Error! Missing initrd image parameter!" >&2
+    [[ -n $CMDLINE ]] || echo "Error! Missing cmdline paramater!" >&2
+    [[ -n $OUTPUT ]] || echo "Error! Missing output parameter!" >&2
+    echo "whaaat?"
+    display_usage
+fi
+
+if ! [[ -f $KERNEL ]] || ! [[ -f $INITRD ]]; then
+    [[ -f $KERNEL ]] || echo "Could not find kernel image $KERNEL" >&2
+    [[ -f $INITRD ]] || echo "Could not find initrd image $INITRD" >&2
+    display_usage
+fi
+
+
+trap '
+    ret=$?;
+    [[ $CMDLINE_DIR ]] && rm -rf -- "$CMDLINE_DIR";
+    exit $ret;
+    ' EXIT
+
+readonly BUILDDIR="$(mktemp -d -t beefi.XXXXXX)"
+
+echo -n "$CMDLINE" > "$BUILDDIR/cmdline.txt"
+
+objcopy \
+    --add-section .osrel=/etc/os-release --change-section-vma .osrel=0x20000 \
+    --add-section .cmdline=$BUILDDIR/cmdline.txt --change-section-vma .cmdline=0x30000 \
+    --add-section .linux=$KERNEL --change-section-vma .linux=0x40000 \
+    --add-section .initrd=$INITRD --change-section-vma .initrd=0x3000000 \
+    $EFISTUB $BUILDDIR/$TMPOUT
+
+cp $BUILDDIR/$TMPOUT $OUTPUT
+
