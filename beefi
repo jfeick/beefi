@@ -8,7 +8,7 @@ INITRD=""
 OUTPUT=""
 
 BEEFI_VERSION="0.1.0"
-CONFIG_FILE="/etc/beefi.conf"
+CONFIG_FILE="/etc/beefi/beefi.conf"
 
 display_usage() {
     echo -e "beefi - a bootable EFISTUB kernel image generator"

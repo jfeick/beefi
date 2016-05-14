@@ -23,7 +23,7 @@ The location of the initrd image (e.g. \fI/boot/initramfs-linux.img\fR)
 The location of the output file (e.g. \fI/boot/efi/EFI/boot/bootx64.efi\fR)
 .TP
 \fB-u | --use-config\fR
-Use the configuration file \fI/etc/beefi.conf\fR
+Use the configuration file \fI/etc/beefi/beefi.conf\fR
 .TP
 \fB-h | --help\fR
 Just print help string and exit
@@ -42,7 +42,7 @@ Run:
 Run:
 \fBbeefi -c "root=UUID=aabbccdd-eeff-0011-223344556677 rw quiet" -k \fI/boot/vmlinuz-linux\fB -i \fI/boot/initramfs-linux.img\fB -o \fIoutput.efi\fR
 .TP 3
-.SS "Create a bootable image using the config file \fI/etc/beefi.conf\fR"
+.SS "Create a bootable image using the config file \fI/etc/beefi/beefi.conf\fR"
 .PP
 Run:
 \fBbeefi -u\fR
