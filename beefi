@@ -62,7 +62,7 @@ parse_config_file() {
     if [ -n "[$config[INITRD]}" ]; then
         INITRD="${config[INITRD]}"
     fi
-    if [ -n "${config[CURRENT]}" ] && [ "${config[CURRENT]}" == "y" ] || [ "${config[CURRENT]}" == "Y"]; then
+    if [ -n "${config[CURRENT]}" ] && [ "${config[CURRENT]}" == "y" ] || [ "${config[CURRENT]}" == "Y" ]; then
         CMDLINE="$(cat /proc/cmdline)"
     fi
     if [ -n "${config[CMDLINE]}" ]; then
