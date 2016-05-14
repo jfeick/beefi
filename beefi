@@ -37,6 +37,7 @@ display_version() {
 }
 
 parse_config_file() {
+    echo -e "Running beefi with configuration file $CONFIG_FILE"
     typeset -A config # init array
     config=( # set default values in config array
         [KERNEL]=""
