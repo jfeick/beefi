@@ -177,3 +177,4 @@ objcopy \
 
 cp $BUILDDIR/$TMPOUT $OUTPUT
 
+echo "Kernel EFI-image successfully installed in $OUTPUT"
