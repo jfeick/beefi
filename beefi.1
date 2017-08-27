@@ -1,12 +1,14 @@
 .\"Manpage for beefi.
 .\" Contact jan-frederick.eick@uni-weimar.de to correct errors or typos.
-.TH man 1 "13 May 2016" "0.1" "beefi man page"
+.TH man 1 "28 August 2017" "0.2" "beefi man page"
 .SH NAME
 beefi \- create a bootable EFISTUB kernel image
 .SH SYNOPSIS
 beefi [ -u ] [ -c CMDLINE ] [ -k KERNEL ] [ -i INITRD ] [ -h ] [ --version ]
 .SH DESCRIPTION
-beefi is a script used to create a bootable EFISTUB kernel image with integrated kernel commandline and initramfs image. It uses objcopy to combine those components to one image which can be directly booted on UEFI systems.
+beefi is a script used to create a bootable EFISTUB kernel image with integrated
+kernel commandline and initramfs image. It uses objcopy to combine those
+components to one image which can be directly booted on UEFI systems.
 .SH OPTIONS
 The following is a list of options accepted by beefi
 .TP
