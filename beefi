@@ -7,7 +7,7 @@ KERNEL=""
 INITRD=""
 OUTPUT=""
 
-BEEFI_VERSION="0.1.0"
+BEEFI_VERSION="0.1.1"
 CONFIG_FILE="/etc/beefi/beefi.conf"
 
 display_usage() {
@@ -16,7 +16,7 @@ display_usage() {
     echo -e "  $0 [-c CMDLINE] [-k KERNEL] [-i INITRD] [-o OUTPUT] [--current-cmdline]"
     echo -e "  $0 -h | --help"
     echo -e "\nArguments:"
-    echo -e "  -u --use-config      Use /etc/beefi.conf for configuration"
+    echo -e "  -u --use-config      Use /etc/beefi/beefi.conf for configuration"
     echo -e "  -c --cmdline         Kernel command line supplied for boot"
     echo -e "  -k --kernel          Kernel image file"
     echo -e "  -i --initrd          Kernel initrd file"
